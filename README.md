@@ -1,4 +1,4 @@
-# Argan-Fire Watch (projet_BD)
+# Argan-Fire Watch — projet_BD
 
 Application Flask : templates dans `templates/`, styles et scripts dans `static/`, logique et données dans `app.py`.
 
