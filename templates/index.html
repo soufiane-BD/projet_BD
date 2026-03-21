@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Accueil — Argan-Fire Watch{% endblock %}
+
+{% block content %}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__grid">
+    <div class="hero__copy">
+      <p class="eyebrow">Thématique 3 · Incendies</p>
+      <h1 id="hero-title" class="hero__title">Protéger les arganiers face au feu</h1>
+      <p class="hero__lead">
+        Détection thermique, simulation de propagation (vent <strong>Chergui</strong>, humidité) et alertes vers les pompiers.
+        Tableau de bord cartographique pour les coopératives du Souss-Massa.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="{{ url_for('dashboard') }}">Ouvrir la carte &amp; propagation</a>
+        <a class="btn btn--ghost" href="{{ url_for('alertes') }}">Voir les alertes</a>
+      </div>
+      <ul class="hero__stats" aria-label="Indicateurs démo">
+        <li><strong>3</strong> <span>coopératives suivies</span></li>
+        <li><strong>50&nbsp;°C</strong> <span>seuil critique capteurs</span></li>
+        <li><strong>Logs</strong> <span>audit append-only</span></li>
+      </ul>
+    </div>
+    <div class="hero__panel panel panel--glass">
+      <h2 class="hero__panel-title">Parcours rapide</h2>
+      <ul class="link-stack">
+        <li>
+          <a class="link-card" href="{{ url_for('dashboard') }}">
+            <span class="link-card__icon" aria-hidden="true">◎</span>
+            <span class="link-card__body">
+              <span class="link-card__label">Carte forestière</span>
+              <span class="link-card__hint">Direction du feu, vent, capteurs</span>
+            </span>
+            <span class="link-card__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+        <li>
+          <a class="link-card" href="{{ url_for('notifications') }}">
+            <span class="link-card__icon" aria-hidden="true">✉</span>
+            <span class="link-card__body">
+              <span class="link-card__label">Notifications</span>
+              <span class="link-card__hint">SMS pompiers, rappels système</span>
+            </span>
+            <span class="link-card__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+        <li>
+          <a class="link-card" href="{{ url_for('login') }}">
+            <span class="link-card__icon" aria-hidden="true">⦿</span>
+            <span class="link-card__body">
+              <span class="link-card__label">Espace coopérative</span>
+              <span class="link-card__hint">Connexion (à brancher à votre auth)</span>
+            </span>
+            <span class="link-card__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="features" aria-labelledby="features-title">
+  <h2 id="features-title" class="section-title section-title--center">Fonctionnalités du projet</h2>
+  <div class="feature-grid">
+    <article class="feature-card">
+      <h3 class="feature-card__title">Détection &amp; triggers</h3>
+      <p class="feature-card__text">Température captée en base, trigger &gt; 50&nbsp;°C pour alerte pompiers (SMS).</p>
+    </article>
+    <article class="feature-card">
+      <h3 class="feature-card__title">Propagation</h3>
+      <p class="feature-card__text">Procédure stockée : probabilité / direction selon vent et humidité, affichée sur la carte.</p>
+    </article>
+    <article class="feature-card">
+      <h3 class="feature-card__title">Intégrité des logs</h3>
+      <p class="feature-card__text">Les preuves restent traçables côté SGBD — le frontal ne fait qu’afficher.</p>
+    </article>
+  </div>
+</section>
+{% endblock %}

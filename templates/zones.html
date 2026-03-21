@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Zones &amp; coopératives — Argan-Fire Watch{% endblock %}
+
+{% block content %}
+<div class="page-head page-head--compact">
+  <div class="page-head__titles">
+    <p class="eyebrow">Périmètres forestiers</p>
+    <h1 class="page-title">Zones surveillées</h1>
+    <p class="lede">
+      Regroupement par coopérative : surface boisée, nombre de capteurs thermiques et niveau de risque sec (vent Chergui, sécheresse).
+      À synchroniser avec vos tables <code>ZONE</code> / <code>COOPERATIVE</code> en base.
+    </p>
+  </div>
+  <div class="notif-toolbar">
+    <span class="chip chip--muted">{{ zones|length }} zone(s)</span>
+    <a class="btn btn--ghost btn--sm" href="{{ url_for('dashboard') }}">Voir la carte</a>
+  </div>
+</div>
+
+<section class="zones-section" aria-labelledby="zones-title">
+  <h2 id="zones-title" class="visually-hidden">Liste des zones</h2>
+
+  <div class="zone-grid">
+    {% for z in zones %}
+    <article class="zone-card zone-card--risk-{{ z.risk }}">
+      <header class="zone-card__head">
+        <h3 class="zone-card__title">{{ z.nom }}</h3>
+        <span class="zone-pill zone-pill--{{ z.risk }}">{{ z.risk_label }}</span>
+      </header>
+      <dl class="zone-meta">
+        <div class="zone-meta__row">
+          <dt>Commune</dt>
+          <dd>{{ z.commune }}</dd>
+        </div>
+        <div class="zone-meta__row">
+          <dt>Surface boisée</dt>
+          <dd>{{ z.surface_ha }} ha</dd>
+        </div>
+        <div class="zone-meta__row">
+          <dt>Capteurs</dt>
+          <dd>{{ z.capteurs }} actifs</dd>
+        </div>
+        <div class="zone-meta__row">
+          <dt>Dernière synchro</dt>
+          <dd><time datetime="{{ z.iso }}">{{ z.derniere_synchro }}</time></dd>
+        </div>
+      </dl>
+      <p class="zone-card__note">{{ z.note }}</p>
+    </article>
+    {% else %}
+    <p class="zone-empty">Aucune zone chargée — branchez votre requête SQL.</p>
+    {% endfor %}
+  </div>
+
+  <aside class="callout callout--security">
+    <h3 class="callout__title">Cartographie</h3>
+    <p class="callout__text">Les polygones détaillés peuvent être superposés sur la <a href="{{ url_for('dashboard') }}">carte principale</a> (GeoJSON / WKT depuis la base). Cette page sert de fiche synthèse par zone.</p>
+  </aside>
+</section>
+{% endblock %}

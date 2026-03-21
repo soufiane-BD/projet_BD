@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Carte &amp; propagation — Argan-Fire Watch{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="page-head__titles">
+    <p class="eyebrow">Surveillance en temps réel</p>
+    <h1 class="page-title">Direction du feu &amp; vent Chergui</h1>
+    <p class="lede">Visualisation forestière des capteurs thermiques et de la propagation estimée (procédure stockée : vent + humidité).</p>
+  </div>
+  <div class="status-pill {% if max_temp_c and max_temp_c > 50 %}status-pill--danger{% else %}status-pill--ok{% endif %}">
+    <span class="status-pill__dot" aria-hidden="true"></span>
+    {% if max_temp_c and max_temp_c > 50 %}
+      <span class="status-pill__text"><strong>Alerte thermique</strong> — seuil pompiers (&gt; 50 °C)</span>
+    {% else %}
+      <span class="status-pill__text"><strong>Veille normale</strong> — aucun dépassement critique</span>
+    {% endif %}
+  </div>
+</div>
+
+<section class="dashboard" aria-labelledby="dash-kpi-title">
+  <h2 id="dash-kpi-title" class="visually-hidden">Indicateurs et carte</h2>
+
+  <aside class="panel panel--glass">
+    <div class="panel__head">
+      <h3 class="panel__title">Capteurs &amp; météo</h3>
+      <span class="panel__badge">Live</span>
+    </div>
+
+    <ul class="kpi-grid">
+      <li class="kpi-card">
+        <span class="kpi-card__icon kpi-card__icon--wind" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h14a3 3 0 100-6M6 18h12a2 2 0 110-4"/><path d="M4 6h10"/></svg>
+        </span>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Vent (Chergui)</span>
+          <span class="kpi-card__value" id="wind-speed">{{ wind_speed_kmh|default(28) }} <small>km/h</small></span>
+        </div>
+      </li>
+      <li class="kpi-card">
+        <span class="kpi-card__icon kpi-card__icon--compass" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7l2 7-7 2 2-7 7-2z"/></svg>
+        </span>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Direction du vent</span>
+          <span class="kpi-card__value" id="wind-deg">{{ wind_direction_deg|default(75) }}°</span>
+          <span class="kpi-card__hint">E-NE</span>
+        </div>
+      </li>
+      <li class="kpi-card">
+        <span class="kpi-card__icon kpi-card__icon--drop" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 11a6 6 0 11-12 0c0-4.5 6-11 6-11z"/></svg>
+        </span>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Humidité relative</span>
+          <span class="kpi-card__value" id="humidity">{{ humidity_pct|default(32) }}<small>%</small></span>
+        </div>
+      </li>
+      <li class="kpi-card {% if max_temp_c and max_temp_c > 50 %}kpi-card--hot{% endif %}">
+        <span class="kpi-card__icon kpi-card__icon--temp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 13V5a2 2 0 114 0v8a4 4 0 11-4 0z"/></svg>
+        </span>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Température max</span>
+          <span class="kpi-card__value" id="temp-max">{{ max_temp_c|default(42) }}<small>°C</small></span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="legend-block">
+      <h4 class="legend-block__title">Légende carte</h4>
+      <ul class="legend-list">
+        <li><span class="legend-line legend-line--wind"></span> Vent (vecteur bleu)</li>
+        <li><span class="legend-line legend-line--fire"></span> Propagation estimée</li>
+        <li><span class="legend-dot legend-dot--sensor"></span> Capteur</li>
+        <li><span class="legend-dot legend-dot--alert"></span> Capteur &gt; 50 °C</li>
+      </ul>
+    </div>
+
+    <p class="fine-print">
+      Branchez vos requêtes SQL / API : <code>map_data</code> (JSON) et variables Jinja pour refléter la probabilité de propagation calculée en base.
+    </p>
+  </aside>
+
+  <div class="map-stage">
+    <div class="map-stage__chrome">
+      <span class="map-stage__label">Carte topographique · OpenTopoMap</span>
+      <span class="map-stage__hint">Zoom · déplacement · popups capteurs</span>
+    </div>
+    <div class="map-wrap">
+      <div id="forest-map" class="forest-map" role="application" aria-label="Carte forestière et direction du feu"></div>
+      <div class="map-badge {% if max_temp_c and max_temp_c > 50 %}map-badge--alert{% endif %}" id="alert-badge" role="status">
+        {% if max_temp_c and max_temp_c > 50 %}
+          <strong>ALERTE</strong> — Température &gt; 50 °C · notification pompiers (SMS / trigger base)
+        {% else %}
+          Surveillance active — aucune alerte critique sur les capteurs affichés
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="page-data">
+{{ map_data|default({})|tojson }}
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/argan_fire_map.js') }}" defer></script>
+{% endblock %}

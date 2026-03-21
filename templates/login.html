@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Connexion — Argan-Fire Watch{% endblock %}
+
+{% block body_class %}page-auth{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+  <section class="auth-aside" aria-hidden="true">
+    <p class="eyebrow">Coopératives</p>
+    <h1 class="auth-aside__title">Argan-Fire Watch</h1>
+    <p class="auth-aside__text">
+      Accès réservé aux gestionnaires de coopérative et aux équipes autorisées. Branchez ce formulaire à votre module d’authentification (session, JWT, LDAP, etc.).
+    </p>
+  </section>
+
+  <section class="auth-card-wrap" aria-labelledby="login-heading">
+    <div class="auth-card panel panel--glass">
+      <h2 id="login-heading" class="auth-card__title">Connexion</h2>
+      <p class="auth-card__subtitle">Identifiant et mot de passe</p>
+
+      {% if error %}
+      <div class="form-alert form-alert--error" role="alert">{{ error }}</div>
+      {% endif %}
+
+      <form class="auth-form" method="post" action="{{ url_for('login') }}" novalidate>
+        <div class="form-field">
+          <label class="form-label" for="email">E-mail ou identifiant</label>
+          <input class="form-input" type="text" id="email" name="email" autocomplete="username" required placeholder="cooperative@example.ma">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="password">Mot de passe</label>
+          <input class="form-input" type="password" id="password" name="password" autocomplete="current-password" required placeholder="••••••••">
+        </div>
+        <div class="form-row">
+          <label class="form-check">
+            <input type="checkbox" name="remember" value="1">
+            <span>Se souvenir de moi</span>
+          </label>
+          <a class="form-link" href="#">Mot de passe oublié ?</a>
+        </div>
+        <button type="submit" class="btn btn--primary btn--block">Se connecter</button>
+      </form>
+
+      <p class="auth-card__footer">
+        Pas encore de compte ? <a href="#">Demander un accès</a> (démo)
+      </p>
+    </div>
+    <p class="auth-legal">
+      En vous connectant, vous acceptez l’usage conforme des données de détection et des journaux d’audit.
+    </p>
+  </section>
+</div>
+{% endblock %}

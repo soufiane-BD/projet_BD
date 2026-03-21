@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Notifications — Argan-Fire Watch{% endblock %}
+
+{% block content %}
+<div class="page-head page-head--compact">
+  <div class="page-head__titles">
+    <p class="eyebrow">Centre de messages</p>
+    <h1 class="page-title">Notifications</h1>
+    <p class="lede">Historique des envois SMS, alertes thermiques et messages système. Les données sensibles restent en base ; ici : vue de synthèse.</p>
+  </div>
+  <div class="notif-toolbar">
+    <span class="chip chip--muted">{{ notifications|length }} notification(s)</span>
+    <button type="button" class="btn btn--ghost btn--sm" disabled title="Branchez une route API pour marquer comme lu">Tout marquer lu</button>
+  </div>
+</div>
+
+<section class="notif-section" aria-labelledby="notif-list-title">
+  <h2 id="notif-list-title" class="visually-hidden">Liste des notifications</h2>
+
+  {% if notifications %}
+  <ul class="notif-list">
+    {% for n in notifications %}
+    <li class="notif-item {% if n.unread %}notif-item--unread{% endif %}">
+      <span class="notif-item__icon notif-item__icon--{{ n.kind }}" aria-hidden="true">
+        {% if n.kind == 'sms' %}📱{% elif n.kind == 'alert' %}⚠{% else %}ℹ{% endif %}
+      </span>
+      <div class="notif-item__body">
+        <div class="notif-item__head">
+          <h3 class="notif-item__title">{{ n.title }}</h3>
+          <time class="notif-item__time" datetime="{{ n.iso }}">{{ n.time }}</time>
+        </div>
+        <p class="notif-item__text">{{ n.text }}</p>
+        {% if n.meta %}
+        <p class="notif-item__meta">{{ n.meta }}</p>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="panel panel--glass notif-empty">
+    <p>Aucune notification pour le moment.</p>
+  </div>
+  {% endif %}
+
+  <aside class="callout callout--security">
+    <h3 class="callout__title">Rappel</h3>
+    <p class="callout__text">Les accusés de réception SMS et l’historique complet sont stockés côté serveur / base pour la conformité et l’audit.</p>
+  </aside>
+</section>
+{% endblock %}

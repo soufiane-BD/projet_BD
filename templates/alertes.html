@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Alertes &amp; journaux — Argan-Fire Watch{% endblock %}
+
+{% block content %}
+<div class="page-head page-head--compact">
+  <div class="page-head__titles">
+    <p class="eyebrow">Traçabilité &amp; sécurité</p>
+    <h1 class="page-title">Alertes &amp; journaux de détection</h1>
+    <p class="lede">Historique des seuils dépassés et événements système. Les logs d’audit en base doivent rester <strong>append-only</strong> (intégrité — pas d’effacement par un incendiaire).</p>
+  </div>
+</div>
+
+<section class="alerts-layout" aria-labelledby="alerts-table-title">
+  <div class="alerts-toolbar">
+    <h2 id="alerts-table-title" class="section-title">Dernières alertes</h2>
+    <div class="alerts-toolbar__meta">
+      <span class="chip chip--muted">{{ alertes|length }} événement(s)</span>
+      <span class="chip chip--ok">Source : base de données / triggers</span>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Horodatage</th>
+          <th scope="col">Coopérative / capteur</th>
+          <th scope="col">Température</th>
+          <th scope="col">Action</th>
+          <th scope="col">Statut log</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in alertes %}
+        <tr class="{% if a.critique %}data-table__row--critique{% endif %}">
+          <td data-label="Horodatage"><time datetime="{{ a.iso }}">{{ a.horodatage }}</time></td>
+          <td data-label="Lieu"><strong>{{ a.lieu }}</strong></td>
+          <td data-label="Temp."><span class="temp-badge {% if a.temp_c > 50 %}temp-badge--hot{% endif %}">{{ a.temp_c }} °C</span></td>
+          <td data-label="Action">{{ a.action }}</td>
+          <td data-label="Log"><span class="log-pill log-pill--{{ a.log_statut }}">{{ a.log_statut }}</span></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="data-table__empty">Aucune alerte chargée — connectez la requête SQL vers cette vue.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="callout callout--security">
+    <h3 class="callout__title">Sécurité des preuves</h3>
+    <p class="callout__text">Le frontend affiche seulement une copie de lecture. L’<strong>immutabilité</strong> des enregistrements bruts (droits <code>INSERT</code> seuls sur la table de logs, triggers d’alerte) est garantie côté SGBD — pas dans le navigateur.</p>
+  </aside>
+</section>
+{% endblock %}

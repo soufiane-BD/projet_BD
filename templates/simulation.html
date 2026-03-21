@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Simulation de propagation — Argan-Fire Watch{% endblock %}
+
+{% block content %}
+<div class="page-head page-head--compact">
+  <div class="page-head__titles">
+    <p class="eyebrow">Modèle &amp; procédure stockée</p>
+    <h1 class="page-title">Simulation de propagation</h1>
+    <p class="lede">
+      Ajustez le vent (<strong>Chergui</strong>), l’humidité et la direction pour estimer une <strong>probabilité de propagation</strong>.
+      Côté production, les mêmes paramètres alimenteront votre <strong>procédure stockée</strong> ; ici le calcul est une <strong>démo frontale</strong> pour le rendu.
+    </p>
+  </div>
+  <a class="btn btn--ghost btn--sm" href="/zones">Zones</a>
+</div>
+
+<section class="sim-layout" aria-labelledby="sim-form-title">
+  <div class="sim-panel panel panel--glass">
+    <h2 id="sim-form-title" class="sim-panel__title">Paramètres</h2>
+    <form class="sim-form" id="sim-form" action="#" onsubmit="return false;">
+      <div class="sim-field">
+        <label class="sim-label" for="sim-wind-kmh">Vitesse du vent (km/h)</label>
+        <div class="sim-field__row">
+          <input class="sim-range" type="range" id="sim-wind-kmh" name="wind_kmh"
+                 min="0" max="80" step="1" value="{{ sim_defaults.wind_kmh }}">
+          <output class="sim-output" for="sim-wind-kmh" id="out-wind-kmh">{{ sim_defaults.wind_kmh }}</output>
+        </div>
+      </div>
+      <div class="sim-field">
+        <label class="sim-label" for="sim-wind-deg">Direction du vent (°)</label>
+        <div class="sim-field__row">
+          <input class="sim-range" type="range" id="sim-wind-deg" name="wind_deg"
+                 min="0" max="359" step="1" value="{{ sim_defaults.wind_deg }}">
+          <output class="sim-output" for="sim-wind-deg" id="out-wind-deg">{{ sim_defaults.wind_deg }}°</output>
+        </div>
+        <p class="sim-hint" id="wind-rose">—</p>
+      </div>
+      <div class="sim-field">
+        <label class="sim-label" for="sim-humidity">Humidité relative (%)</label>
+        <div class="sim-field__row">
+          <input class="sim-range" type="range" id="sim-humidity" name="humidity"
+                 min="5" max="100" step="1" value="{{ sim_defaults.humidity }}">
+          <output class="sim-output" for="sim-humidity" id="out-humidity">{{ sim_defaults.humidity }}</output>
+        </div>
+      </div>
+      <button type="button" class="btn btn--primary btn--block" id="sim-recalc">Recalculer</button>
+    </form>
+  </div>
+
+  <div class="sim-panel panel panel--glass sim-panel--result">
+    <h2 class="sim-panel__title">Résultat (démo)</h2>
+    <div class="sim-gauge" aria-live="polite">
+      <div class="sim-gauge__track">
+        <div class="sim-gauge__fill" id="sim-gauge-fill" style="width: 0%"></div>
+      </div>
+      <p class="sim-prob">
+        Probabilité de propagation estimée :
+        <strong id="sim-prob-value">—</strong>
+      </p>
+    </div>
+    <dl class="sim-dl">
+      <div class="sim-dl__row">
+        <dt>Direction dominante du front</dt>
+        <dd id="sim-spread-deg">—</dd>
+      </div>
+      <div class="sim-dl__row">
+        <dt>Indice combiné (vent × sécheresse)</dt>
+        <dd id="sim-index">—</dd>
+      </div>
+    </dl>
+    <div class="callout callout--security sim-qa">
+      <h3 class="callout__title">QA · IA vs manuel</h3>
+      <p class="callout__text">
+        Comparez ce score à la sortie de votre procédure SQL et, le cas échéant, à un modèle IA entraîné sur le même jeu de paramètres pour mesurer l’écart (précision du calcul de propagation).
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/simulation.js') }}" defer></script>
+{% endblock %}
