@@ -92,7 +92,7 @@ def add_alerte(mesure_id, niveau_risque, message):
     loc_capteur = sensor["localisation"] if sensor else "Non précisée"
 
     # Déclenchement de la notification par email
-    sujet = f"🔥 ARGAN-FIRE WATCH : Alerte {niveau_risque.upper()}"
+    sujet = f" ARGAN-FIRE WATCH : Alerte {niveau_risque.upper()}"
     corps = (
         f"Une alerte de risque {niveau_risque} a été détectée sur le réseau de surveillance.\n\n"
         f"Détails de l'incident :\n"
