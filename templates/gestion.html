@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+{% block title %}Gestion des Données - Argan-Fire Watch{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  /* Forcer le conteneur principal à s'élargir pour cette page */
+  .shell-main {
+    max-width: 1600px !important;
+    width: 95% !important;
+    margin: 0 auto !important;
+  }
+  #picker-map { height: 300px; border-radius: 8px; margin-bottom: 1.5rem; border: 2px solid var(--color-border); }
+  .management-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Deux colonnes égales */
+    gap: 3rem;
+    width: 100% !important;
+    align-items: start;
+  }
+  @media (max-width: 1024px) {
+    .management-grid { grid-template-columns: 1fr; } /* Empile sur mobile/tablette */
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="page-head__titles">
+    <p class="eyebrow">Administration</p>
+    <h1 class="page-title">Gestion &amp; Simulation</h1>
+    <p class="lede">Interface de test pour simuler l'envoi de données et vérifier les alertes automatiques.</p>
+  </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages" style="margin-bottom: 2rem;">
+      {% for category, message in messages %}
+        <div class="form-alert form-alert--{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="panel panel--glass mb-4" style="width: 100%;">
+  <div class="panel__head"><h3 class="panel__title"> Sélecteur de coordonnées</h3></div>
+  <div class="panel__body" style="padding: 1rem;">
+    <p class="small text-muted">Cliquez sur la carte pour récupérer automatiquement la Latitude et la Longitude pour vos formulaires ci-dessous.</p>
+    <div id="picker-map"></div>
+  </div>
+</div>
+
+<section class="management-container" style="width: 100%; display: block;">
+  <div class="management-grid">
+    
+    <!-- Colonne GAUCHE : Configuration Structurelle -->
+    <div class="column-config" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <p class="eyebrow" style="color: var(--color-primary); margin-bottom: -0.5rem;">1. Configuration du réseau</p>
+        
+        <!-- A. Nouvelle Coopérative -->
+        <div class="panel panel--glass">
+          <div class="panel__head"><h3 class="panel__title">A. Nouvelle Coopérative</h3></div>
+          <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="form_type" value="cooperative">
+            <div class="form-field">
+              <label class="form-label">Nom de la Coopérative</label>
+              <input class="form-input" type="text" name="nom" placeholder="ex: Coopérative Amal" required>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Région</label>
+                <input class="form-input" type="text" name="region" placeholder="ex: Souss-Massa">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Ville / Commune</label>
+                <input class="form-input" type="text" name="ville" placeholder="ex: Taroudant">
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Adresse</label>
+              <input class="form-input" type="text" name="adresse" placeholder="ex: Route de Taliouine">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Date de création</label>
+              <input class="form-input" type="date" name="date_crea">
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <input class="form-input pick-lat" type="number" step="0.000001" name="latitude" placeholder="Lat">
+              </div>
+              <div class="form-field">
+                <input class="form-input pick-lng" type="number" step="0.000001" name="longitude" placeholder="Lng">
+              </div>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">Créer la Coopérative</button>
+          </form>
+        </div>
+
+        <!-- B. Nouvelle Zone -->
+        <div class="panel panel--glass">
+          <div class="panel__head"><h3 class="panel__title">B. Nouvelle Zone</h3></div>
+          <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="form_type" value="zone">
+            <div class="form-field">
+              <label class="form-label">Nom de la Zone</label>
+              <input class="form-input" type="text" name="nom" placeholder="ex: Secteur Nord-Est" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Coopérative de rattachement</label>
+              <select class="form-input" name="id_cooperative" required>
+                <option value="" disabled selected>Choisir une coopérative...</option>
+                {% for coop in cooperatives %}
+                <option value="{{ coop.id }}">{{ coop.nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">Ajouter la Zone</button>
+          </form>
+        </div>
+
+        <!-- C. Nouveau Capteur -->
+        <div class="panel panel--glass">
+          <div class="panel__head"><h3 class="panel__title">C. Nouveau Capteur</h3></div>
+          <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="form_type" value="capteur">
+            <div class="form-field">
+              <label class="form-label" for="nom">Nom du capteur</label>
+              <input class="form-input" type="text" id="nom" name="nom" placeholder="ex: Capteur T2 - Sud" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="localisation">Localisation (Coopérative)</label>
+              <input class="form-input" type="text" id="localisation" name="localisation" placeholder="ex: Coopérative Amal, Secteur Nord-Est...">
+              <p class="sim-hint" style="font-size: 0.75rem; margin-top: 0.2rem; opacity: 0.7;">Indiquez le nom du lieu, de la coopérative ou un repère visuel.</p>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Zone de surveillance</label>
+              <select class="form-input" name="id_zone">
+                <option value="">Aucune zone spécifique</option>
+                {% for zone in zones %}
+                <option value="{{ zone.id }}">{{ zone.nom }} ({{ zone.coop_nom }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Latitude</label>
+                <input class="form-input pick-lat" type="number" step="0.000001" name="latitude" placeholder="30.42">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Longitude</label>
+                <input class="form-input pick-lng" type="number" step="0.000001" name="longitude" placeholder="-9.60">
+              </div>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">Créer le Capteur</button>
+          </form>
+        </div>
+
+        <!-- D. Nouvel Utilisateur -->
+        <div class="panel panel--glass">
+          <div class="panel__head"><h3 class="panel__title">D. Nouvel Utilisateur</h3></div>
+          <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="form_type" value="user">
+            <div class="form-field">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" name="email" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Mot de passe</label>
+              <input class="form-input" type="password" name="password" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Nom complet</label>
+              <input class="form-input" type="text" name="nom" placeholder="ex: Ahmed Mansouri">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Coopérative responsable</label>
+              <select class="form-input" name="id_cooperative">
+                <option value="">Aucune (Admin Global)</option>
+                {% for coop in cooperatives %}
+                <option value="{{ coop.id }}">{{ coop.nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">Créer l'Utilisateur</button>
+          </form>
+        </div>
+
+        <!-- E. Nouveau Pompier -->
+        <div class="panel panel--glass">
+          <div class="panel__head"><h3 class="panel__title">E. Nouveau Pompier</h3></div>
+          <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="form_type" value="pompier">
+            <div class="form-field">
+              <label class="form-label">Nom</label>
+              <input class="form-input" type="text" name="nom" placeholder="ex: Dupont" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Prénom</label>
+              <input class="form-input" type="text" name="prenom" placeholder="ex: Jean">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Email (pour notifications)</label>
+              <input class="form-input" type="email" name="email" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Mot de passe provisoire</label>
+              <input class="form-input" type="password" name="password" value="pompier123" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Téléphone</label>
+              <input class="form-input" type="tel" name="telephone" placeholder="ex: +212612345678" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">Créer le compte Pompier</button>
+          </form>
+        </div>
+    </div>
+
+    <!-- Colonne DROITE : Opérations et Simulation -->
+    <div class="column-ops" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <p class="eyebrow" style="color: var(--color-error); margin-bottom: -0.5rem;">2. Simulation et Tests</p>
+
+        <!-- 2. Envoyer une Mesure -->
+        <div class="panel panel--glass">
+          <div class="panel__head"><h3 class="panel__title">2. Envoyer une Mesure</h3></div>
+          <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="form_type" value="mesure">
+            <div class="form-field">
+              <label class="form-label" for="capteur_id">Capteur</label>
+              <select class="form-input" id="capteur_id" name="capteur_id" required>
+                <option value="" selected disabled>Choisir un capteur...</option>
+                {% for c in capteurs %}
+                <option value="{{ c.id }}">{{ c.nom }} (ID: {{ c.id }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">T° (°C)</label>
+                <input class="form-input" type="number" step="0.1" name="temperature" required placeholder="52">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Humidité (%)</label>
+                <input class="form-input" type="number" step="0.1" name="humidite" required placeholder="18">
+              </div>
+            </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Vitesse vent (km/h)</label>
+                        <input class="form-input" type="number" step="0.1" name="vitesse_vent" placeholder="25">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Direction vent (°)</label>
+                        <input class="form-input" type="number" step="1" name="direction_vent" placeholder="90">
+                    </div>
+                </div>
+            <button type="submit" class="btn btn--primary btn--block">Enregistrer la mesure</button>
+            <p class="sim-hint mt-2" style="font-size: 0.8rem; opacity: 0.8;">Note : Une alerte automatique est générée si Temp > 45°C et Hum < 20%.</p>
+          </form>
+        </div>
+
+        <!-- 3. Forcer une Alerte -->
+        <div class="panel panel--glass">
+          <div class="panel__head"><h3 class="panel__title">3. Forcer une Alerte</h3></div>
+          <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="form_type" value="alerte">
+            <div class="form-field">
+              <label class="form-label" for="mesure_id">Mesure cible</label>
+              <select class="form-input" id="mesure_id" name="mesure_id" required>
+                <option value="" selected disabled>Choisir une mesure...</option>
+                {% for m in mesures %}
+                <option value="{{ m.id }}">Mesure #{{ m.id }} (T: {{ m.temperature }}°C)</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Message d'alerte</label>
+              <textarea class="form-input" name="message" rows="2" required>Alerte générée manuellement par l'administrateur.</textarea>
+            </div>
+            <button type="submit" class="btn btn--ghost btn--block">Générer l'alerte</button>
+          </form>
+        </div>
+
+        <!-- Zone de Danger : Réinitialisation -->
+        <div class="panel panel--glass mt-4" style="border: 1px solid var(--color-error); opacity: 0.8;">
+          <div class="panel__head"><h3 class="panel__title" style="color: var(--color-error);">⚠️ Zone de Danger</h3></div>
+          <div class="panel__body" style="padding: 1rem;">
+            <p class="small">Cette action supprimera toutes les coopératives, zones, capteurs, mesures, alertes et pompiers. <strong>Les utilisateurs ne seront pas supprimés.</strong></p>
+            <form method="POST" onsubmit="return confirm('ÊTES-VOUS SÛR ? Cette action supprimera TOUTES les données de terrain (sauf utilisateurs).');">
+              <input type="hidden" name="form_type" value="reset_all">
+              <button type="submit" class="btn btn--sm btn--block" style="background: var(--color-error); color: white; margin-top: 1rem;">Réinitialiser tout le réseau</button>
+            </form>
+          </div>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- Nouvelle section : Liste et Actions -->
+<section class="management-container mt-4" style="width: 100%; margin-top: 3rem;">
+    <div class="panel panel--glass">
+        <div class="panel__head"><h3 class="panel__title">📋 Inventaire du réseau</h3></div>
+        <div class="table-wrap" style="padding: 1rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Nom / Détails</th>
+                        <th>Localisation</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coop in cooperatives %}
+                    <tr>
+                        <td><span class="log-pill log-pill--lecture">Coopérative</span></td>
+                        <td><strong>{{ coop.nom }}</strong></td>
+                        <td>{{ coop.ville }}</td>
+                        <td>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette coopérative ?');">
+                                <input type="hidden" name="form_type" value="delete_cooperative">
+                                <input type="hidden" name="id" value="{{ coop.id }}">
+                                <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for zone in zones %}
+                    <tr>
+                        <td><span class="log-pill log-pill--immutable">Zone</span></td>
+                        <td>{{ zone.nom }}</td>
+                        <td>Coop: {{ zone.coop_nom }}</td>
+                        <td>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette zone ?');">
+                                <input type="hidden" name="form_type" value="delete_zone">
+                                <input type="hidden" name="id" value="{{ zone.id }}">
+                                <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for capteur in capteurs %}
+                    <tr>
+                        <td><span class="log-pill log-pill--ok">Capteur</span></td>
+                        <td>{{ capteur.nom }}</td>
+                        <td>ID: {{ capteur.id }}</td>
+                        <td>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer ce capteur ?');">
+                                <input type="hidden" name="form_type" value="delete_capteur">
+                                <input type="hidden" name="id" value="{{ capteur.id }}">
+                                <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for user in users %}
+                    <tr>
+                        <td><span class="log-pill" style="background: var(--color-primary);">Utilisateur</span></td>
+                        <td><strong>{{ user.nom or 'N/A' }}</strong></td>
+                        <td>
+                            {{ user.email }}<br>
+                            <small style="opacity: 0.7;">Responsable : {{ user.coop_nom or 'Global' }}</small>
+                        </td>
+                        <td>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                <input type="hidden" name="form_type" value="delete_user">
+                                <input type="hidden" name="id" value="{{ user.id }}">
+                                <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for p in pompiers %}
+                    <tr>
+                        <td><span class="log-pill" style="background: var(--color-info);">Pompier</span></td>
+                        <td><strong>{{ p.nom }} {{ p.prenom }}</strong></td>
+                        <td>{{ p.email }}</td>
+                        <td>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer ce pompier ?');">
+                                <input type="hidden" name="form_type" value="delete_pompier">
+                                <input type="hidden" name="id" value="{{ p.id }}">
+                                <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div class="mt-4" style="text-align: center;">
+    <a href="{{ url_for('dashboard') }}" class="btn btn--ghost">Retour au Dashboard</a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const map = L.map('picker-map').setView([30.4278, -9.5981], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    let marker;
+    map.on('click', function(e) {
+      const lat = e.latlng.lat.toFixed(6);
+      const lng = e.latlng.lng.toFixed(6);
+
+      if (marker) { marker.setLatLng(e.latlng); } 
+      else { marker = L.marker(e.latlng).addTo(map); }
+
+      // Remplit tous les champs de latitude/longitude visibles sur la page
+      document.querySelectorAll('.pick-lat').forEach(el => el.value = lat);
+      document.querySelectorAll('.pick-lng').forEach(el => el.value = lng);
+    });
+  });
+</script>
+{% endblock %}

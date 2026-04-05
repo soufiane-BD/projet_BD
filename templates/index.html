@@ -15,10 +15,10 @@
         <a class="btn btn--primary" href="{{ url_for('dashboard') }}">Ouvrir la carte &amp; propagation</a>
         <a class="btn btn--ghost" href="{{ url_for('alertes') }}">Voir les alertes</a>
       </div>
-      <ul class="hero__stats" aria-label="Indicateurs démo">
-        <li><strong>3</strong> <span>coopératives suivies</span></li>
-        <li><strong>50&nbsp;°C</strong> <span>seuil critique capteurs</span></li>
-        <li><strong>Logs</strong> <span>audit append-only</span></li>
+      <ul class="hero__stats" aria-label="Indicateurs réels">
+        <li><strong>{{ stats.total_coops }}</strong> <span>coopératives suivies</span></li>
+        <li><strong>{{ weather.temperature|default('--') }}°C</strong> <span>température locale</span></li>
+        <li><strong>{{ stats.total_alertes }}</strong> <span>alertes enregistrées</span></li>
       </ul>
     </div>
     <div class="hero__panel panel panel--glass">
@@ -56,6 +56,24 @@
         </li>
       </ul>
     </div>
+  </div>
+</section>
+
+<section class="features" style="padding-top: 0; margin-top: -1rem;">
+  <h2 class="section-title section-title--center">Activités récentes</h2>
+  <div class="feature-grid">
+    {% for alerte in recent_alerts %}
+    <article class="feature-card {% if alerte.critique %}zone-card--risk-high{% endif %}" style="border-radius: var(--radius);">
+      <p class="eyebrow" style="font-size: 0.65rem; margin-bottom: 0.25rem;">{{ alerte.horodatage }}</p>
+      <h3 class="feature-card__title">{{ alerte.lieu }}</h3>
+      <p class="feature-card__text">
+        Température relevée : <strong>{{ alerte.temp_c }}°C</strong><br>
+        Action : <em>{{ alerte.action }}</em>
+      </p>
+    </article>
+    {% else %}
+    <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); opacity: 0.7;">Aucune donnée d'alerte disponible pour le moment.</p>
+    {% endfor %}
   </div>
 </section>
 

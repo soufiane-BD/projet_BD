@@ -52,10 +52,10 @@
         <a href="{{ url_for('dashboard') }}" class="nav__link {% if active_page == 'dashboard' %}nav__link--active{% endif %}">
           <span class="nav__ico" aria-hidden="true">◎</span> Carte
         </a>
-        <a href="/zones" class="nav__link {% if active_page == 'zones' %}nav__link--active{% endif %}">
+        <a href="{{ url_for('zones') }}" class="nav__link {% if active_page == 'zones' %}nav__link--active{% endif %}">
           <span class="nav__ico" aria-hidden="true">▣</span> Zones
         </a>
-        <a href="/simulation" class="nav__link {% if active_page == 'simulation' %}nav__link--active{% endif %}">
+        <a href="{{ url_for('simulation') }}" class="nav__link {% if active_page == 'simulation' %}nav__link--active{% endif %}">
           <span class="nav__ico" aria-hidden="true">⟳</span> Simulation
         </a>
         <a href="{{ url_for('alertes') }}" class="nav__link {% if active_page == 'alertes' %}nav__link--active{% endif %}">
@@ -63,6 +63,9 @@
         </a>
         <a href="{{ url_for('notifications') }}" class="nav__link {% if active_page == 'notifications' %}nav__link--active{% endif %}">
           <span class="nav__ico" aria-hidden="true">✉</span> Notifications
+        </a>
+        <a href="{{ url_for('gestion') }}" class="nav__link {% if active_page == 'gestion' %}nav__link--active{% endif %}">
+          <span class="nav__ico" aria-hidden="true">⚙</span> Gestion
         </a>
         <a href="{{ url_for('login') }}" class="nav__link nav__link--cta {% if active_page == 'login' %}nav__link--active{% endif %}">
           <span class="nav__ico" aria-hidden="true">⦿</span> Connexion
@@ -72,6 +75,15 @@
   </header>
 
   <main id="main-content" class="shell-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="form-alert form-alert--{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
   </main>
 

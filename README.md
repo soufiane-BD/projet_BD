@@ -32,10 +32,22 @@ Tout se joue dans **`app.py`** : remplacer les listes `*_DEMO` et les dictionnai
 - Ne pas exposer les identifiants de base dans le dépôt : variables d’environnement (`python-dotenv`).
 - Les **logs immuables** et **triggers SMS** restent côté base ; le front affiche seulement l’état courant.
 
-## Lancer le serveur
+## Installation & Setup (Collaborateurs)
 
-```bash
-py -3.14 app.py
-```
+1. **Environnement virtuel** :
+   ```bash
+   python -m venv .venv
+   # Activer (Windows): .venv\Scripts\activate
+   ```
+2. **Dépendances** :
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configuration Secrets** :
+   Copiez `.env.example` vers `.env` et remplissez vos identifiants Gmail (Mot de passe d'application).
 
-Ou `run.bat`. Si `flask` n’est pas trouvé avec `python`, utilisez le même Python que pour `pip install flask` (voir commentaire en tête de `app.py`).
+4. **Lancer le serveur** :
+   ```bash
+   python app.py
+   ```
+   Accès : http://127.0.0.1:5000 | Admin par défaut : `admin@argan.ma` / `admin123`

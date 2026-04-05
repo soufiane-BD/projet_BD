@@ -14,6 +14,31 @@
   <a class="btn btn--ghost btn--sm" href="/zones">Zones</a>
 </div>
 
+{% if live_sim %}
+<!-- Section Résultats Réels -->
+<div class="panel panel--glass mb-4" style="border: 1px solid var(--color-primary); padding: 1.5rem;">
+    <div class="panel__head">
+        <h3 class="panel__title"> Analyse en temps réel (Données Capteurs)</h3>
+        <span class="panel__badge">Live</span>
+    </div>
+    <p class="lede" style="margin-bottom: 1rem;">Calculé automatiquement à partir du dernier relevé capteur reçu.</p>
+    <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div class="kpi-card">
+            <div class="kpi-card__body">
+                <span class="kpi-card__label">Score de propagation</span>
+                <span class="kpi-card__value">{{ live_sim.score }}</span>
+            </div>
+        </div>
+        <div class="kpi-card {% if live_sim.risk_level == 'High propagation' %}kpi-card--hot{% endif %}">
+            <div class="kpi-card__body">
+                <span class="kpi-card__label">Niveau de risque</span>
+                <span class="kpi-card__value" style="font-size: 1.25rem;">{{ live_sim.risk_level }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <section class="sim-layout" aria-labelledby="sim-form-title">
   <div class="sim-panel panel panel--glass">
     <h2 id="sim-form-title" class="sim-panel__title">Paramètres</h2>
@@ -34,6 +59,14 @@
           <output class="sim-output" for="sim-wind-deg" id="out-wind-deg">{{ sim_defaults.wind_deg }}°</output>
         </div>
         <p class="sim-hint" id="wind-rose">—</p>
+      </div>
+      <div class="sim-field">
+        <label class="sim-label" for="sim-temp">Température ambiante (°C)</label>
+        <div class="sim-field__row">
+          <input class="sim-range" type="range" id="sim-temp" name="temp"
+                 min="0" max="60" step="1" value="25">
+          <output class="sim-output" for="sim-temp" id="out-temp">25</output>
+        </div>
       </div>
       <div class="sim-field">
         <label class="sim-label" for="sim-humidity">Humidité relative (%)</label>
@@ -66,6 +99,18 @@
       <div class="sim-dl__row">
         <dt>Indice combiné (vent × sécheresse)</dt>
         <dd id="sim-index">—</dd>
+      </div>
+      <div class="sim-dl__row">
+        <dt>Impact Chaleur</dt>
+        <dd id="impact-temp" class="log-pill" style="background: none; border: 1px solid rgba(255,255,255,0.2);">Stable</dd>
+      </div>
+      <div class="sim-dl__row">
+        <dt>Impact Vent</dt>
+        <dd id="impact-wind" class="log-pill" style="background: none; border: 1px solid rgba(255,255,255,0.2);">Faible</dd>
+      </div>
+      <div class="sim-dl__row">
+        <dt>Impact Aridité</dt>
+        <dd id="impact-hum" class="log-pill" style="background: none; border: 1px solid rgba(255,255,255,0.2);">Normal</dd>
       </div>
     </dl>
     <div class="callout callout--security sim-qa">

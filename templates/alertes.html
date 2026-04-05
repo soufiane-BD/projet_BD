@@ -28,6 +28,7 @@
           <th scope="col">Température</th>
           <th scope="col">Action</th>
           <th scope="col">Statut log</th>
+          <th scope="col">État</th>
         </tr>
       </thead>
       <tbody>
@@ -38,6 +39,25 @@
           <td data-label="Temp."><span class="temp-badge {% if a.temp_c > 50 %}temp-badge--hot{% endif %}">{{ a.temp_c }} °C</span></td>
           <td data-label="Action">{{ a.action }}</td>
           <td data-label="Log"><span class="log-pill log-pill--{{ a.log_statut }}">{{ a.log_statut }}</span></td>
+          <td data-label="État">
+            {% if current_user.is_authenticated and current_user.role == 'pompier' %}
+            <form action="{{ url_for('traiter_alerte', alerte_id=a.id) }}" method="POST">
+              <button type="submit" class="btn btn--sm {% if a.est_traite %}btn--ghost{% else %}btn--primary{% endif %}" style="min-width: 120px;">
+                {% if a.est_traite %}
+                  <span style="color: var(--ok);">✓ Traitée</span>
+                {% else %}
+                  Marquer traité
+                {% endif %}
+              </button>
+            </form>
+            {% else %}
+              {% if a.est_traite %}
+                <span class="log-pill log-pill--ok">Traitée</span>
+              {% else %}
+                <span class="log-pill" style="background: rgba(255, 255, 255, 0.1); color: var(--muted);">Non traitée</span>
+              {% endif %}
+            {% endif %}
+          </td>
         </tr>
         {% else %}
         <tr>
