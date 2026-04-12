@@ -1,6 +1,9 @@
 import os
 import sqlite3
+
 from werkzeug.security import generate_password_hash
+
+import config as app_config
 
 # Database file path in the project root.
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "database.db")
@@ -170,14 +173,19 @@ def init_db():
         cursor.execute("ALTER TABLE pompiers ADD COLUMN created_by_admin_id INTEGER")
     except sqlite3.OperationalError:
         pass
+    try:
+        cursor.execute("ALTER TABLE alerte ADD COLUMN created_by_user_ref TEXT")
+    except sqlite3.OperationalError:
+        pass
 
-    # Création d'un utilisateur admin par défaut si la table est vide
+    # Premier administrateur : uniquement si INITIAL_ADMIN_PASSWORD est défini (jamais de mot de passe faible par défaut)
     cursor.execute("SELECT COUNT(*) FROM user")
-    if cursor.fetchone()[0] == 0:
-        # Identifiants par défaut : admin@argan.ma / admin123
-        admin_hash = generate_password_hash("admin123")
-        cursor.execute("INSERT INTO user (email, password_hash, nom) VALUES (?, ?, ?)",
-                       ("admin@argan.ma", admin_hash, "Administrateur"))
+    if cursor.fetchone()[0] == 0 and app_config.INITIAL_ADMIN_PASSWORD:
+        admin_hash = generate_password_hash(app_config.INITIAL_ADMIN_PASSWORD)
+        cursor.execute(
+            "INSERT INTO user (email, password_hash, nom) VALUES (?, ?, ?)",
+            (app_config.INITIAL_ADMIN_EMAIL, admin_hash, "Administrateur"),
+        )
 
     connection.commit()
     connection.close()

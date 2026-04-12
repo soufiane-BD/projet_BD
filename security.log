@@ -1,0 +1,10 @@
+2026-04-11 22:33:22,582 WARNING Accès API refusé : non authentifié /api/capteurs
+2026-04-11 22:33:22,584 WARNING Accès API refusé : non authentifié /api/alertes
+2026-04-11 22:33:40,787 WARNING Échec de connexion pour email=a@b.c ip=127.0.0.1
+2026-04-11 22:34:00,618 WARNING Échec de connexion pour email=x ip=127.0.0.1
+2026-04-11 22:34:20,216 WARNING Accès API refusé : non authentifié /api/capteurs
+2026-04-11 22:34:20,218 WARNING Accès API refusé : non authentifié /api/alertes
+2026-04-12 02:03:29,254 WARNING Accès API refusé : non authentifié /api/capteurs
+2026-04-12 02:05:50,491 WARNING Accès API refusé : non authentifié /api/alertes
+2026-04-12 02:12:54,336 WARNING Accès API refusé : non authentifié /api/alertes
+2026-04-12 02:25:19,580 WARNING Accès API refusé : non authentifié /api/capteurs

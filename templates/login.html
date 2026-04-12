@@ -23,6 +23,7 @@
       {% endif %}
 
       <form class="auth-form" method="post" action="{{ url_for('login') }}" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-field">
           <label class="form-label" for="email">E-mail ou identifiant</label>
           <input class="form-input" type="text" id="email" name="email" autocomplete="username" required placeholder="cooperative@example.ma">

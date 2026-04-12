@@ -11,6 +11,13 @@ def get_all_alertes():
     return [dict(row) for row in rows]
 
 
+def get_alerte(alerte_id):
+    connection = get_db_connection()
+    row = connection.execute("SELECT * FROM alerte WHERE id = ?", (alerte_id,)).fetchone()
+    connection.close()
+    return dict(row) if row else None
+
+
 def get_alertes_for_view():
     """Return alertes formatted for the alertes template."""
     connection = get_db_connection()
@@ -67,10 +74,10 @@ def toggle_alerte_status(alerte_id):
     return True
 
 
-def add_alerte(mesure_id, niveau_risque, message):
+def add_alerte(mesure_id, niveau_risque, message, created_by_user_ref=None):
     """Create a new alerte linked to a mesure."""
     connection = get_db_connection()
-    
+
     # Récupérer les détails du capteur pour enrichir l'email
     sensor_query = """
         SELECT c.nom, c.localisation 
@@ -81,8 +88,8 @@ def add_alerte(mesure_id, niveau_risque, message):
     sensor = connection.execute(sensor_query, (mesure_id,)).fetchone()
 
     cursor = connection.execute(
-        "INSERT INTO alerte (mesure_id, niveau_risque, message) VALUES (?, ?, ?)",
-        (mesure_id, niveau_risque, message),
+        "INSERT INTO alerte (mesure_id, niveau_risque, message, created_by_user_ref) VALUES (?, ?, ?, ?)",
+        (mesure_id, niveau_risque, message, created_by_user_ref),
     )
     connection.commit()
     alerte_id = cursor.lastrowid
@@ -100,9 +107,8 @@ def add_alerte(mesure_id, niveau_risque, message):
         f"- Localisation : {loc_capteur}\n"
         f"- Message : {message}\n"
         f"- Date/Heure : {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-        
     )
-    
+
     statut, notified_pompier_ids = send_email_notification(sujet, corps)
     log_notification_to_db(alerte_id, message, statut, notified_pompier_ids)
 

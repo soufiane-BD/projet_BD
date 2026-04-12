@@ -1,4 +1,5 @@
 from utils.database import get_db_connection
+from utils.security import validate_password_strength
 from werkzeug.security import generate_password_hash
 
 def get_all_pompiers():
@@ -10,6 +11,8 @@ def get_all_pompiers():
 
 def add_pompier(nom, prenom, email, telephone, password, admin_id):
     """Add a new pompier record."""
+    if not validate_password_strength(password):
+        raise ValueError("Mot de passe trop faible.")
     pw_hash = generate_password_hash(password)
     connection = get_db_connection()
     cursor = connection.execute(
@@ -29,3 +32,10 @@ def delete_pompier(pompier_id):
     deleted = cursor.rowcount > 0
     connection.close()
     return deleted
+
+
+def update_pompier_password(pompier_id, password_hash):
+    connection = get_db_connection()
+    connection.execute("UPDATE pompiers SET password_hash = ? WHERE id = ?", (password_hash, pompier_id))
+    connection.commit()
+    connection.close()

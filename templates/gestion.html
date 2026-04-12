@@ -63,6 +63,7 @@
         <div class="panel panel--glass">
           <div class="panel__head"><h3 class="panel__title">A. Nouvelle Coopérative</h3></div>
           <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="form_type" value="cooperative">
             <div class="form-field">
               <label class="form-label">Nom de la Coopérative</label>
@@ -102,6 +103,7 @@
         <div class="panel panel--glass">
           <div class="panel__head"><h3 class="panel__title">B. Nouvelle Zone</h3></div>
           <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="form_type" value="zone">
             <div class="form-field">
               <label class="form-label">Nom de la Zone</label>
@@ -124,6 +126,7 @@
         <div class="panel panel--glass">
           <div class="panel__head"><h3 class="panel__title">C. Nouveau Capteur</h3></div>
           <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="form_type" value="capteur">
             <div class="form-field">
               <label class="form-label" for="nom">Nom du capteur</label>
@@ -161,6 +164,7 @@
         <div class="panel panel--glass">
           <div class="panel__head"><h3 class="panel__title">D. Nouvel Utilisateur</h3></div>
           <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="form_type" value="user">
             <div class="form-field">
               <label class="form-label">Email</label>
@@ -191,6 +195,7 @@
         <div class="panel panel--glass">
           <div class="panel__head"><h3 class="panel__title">E. Nouveau Pompier</h3></div>
           <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="form_type" value="pompier">
             <div class="form-field">
               <label class="form-label">Nom</label>
@@ -206,7 +211,7 @@
             </div>
             <div class="form-field">
               <label class="form-label">Mot de passe provisoire</label>
-              <input class="form-input" type="password" name="password" value="pompier123" required>
+              <input class="form-input" type="password" name="password" required placeholder="Mot de passe fort (8+ car., maj., chiffre, spécial)">
             </div>
             <div class="form-field">
               <label class="form-label">Téléphone</label>
@@ -225,6 +230,7 @@
         <div class="panel panel--glass">
           <div class="panel__head"><h3 class="panel__title">2. Envoyer une Mesure</h3></div>
           <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="form_type" value="mesure">
             <div class="form-field">
               <label class="form-label" for="capteur_id">Capteur</label>
@@ -264,6 +270,7 @@
         <div class="panel panel--glass">
           <div class="panel__head"><h3 class="panel__title">3. Forcer une Alerte</h3></div>
           <form class="auth-form" method="POST" action="{{ url_for('gestion') }}" style="padding: 1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="form_type" value="alerte">
             <div class="form-field">
               <label class="form-label" for="mesure_id">Mesure cible</label>
@@ -288,6 +295,7 @@
           <div class="panel__body" style="padding: 1rem;">
             <p class="small">Cette action supprimera toutes les coopératives, zones, capteurs, mesures, alertes et pompiers. <strong>Les utilisateurs ne seront pas supprimés.</strong></p>
             <form method="POST" onsubmit="return confirm('ÊTES-VOUS SÛR ? Cette action supprimera TOUTES les données de terrain (sauf utilisateurs).');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <input type="hidden" name="form_type" value="reset_all">
               <button type="submit" class="btn btn--sm btn--block" style="background: var(--color-error); color: white; margin-top: 1rem;">Réinitialiser tout le réseau</button>
             </form>
@@ -319,6 +327,7 @@
                         <td>{{ coop.ville }}</td>
                         <td>
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette coopérative ?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <input type="hidden" name="form_type" value="delete_cooperative">
                                 <input type="hidden" name="id" value="{{ coop.id }}">
                                 <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
@@ -333,6 +342,7 @@
                         <td>Coop: {{ zone.coop_nom }}</td>
                         <td>
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette zone ?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <input type="hidden" name="form_type" value="delete_zone">
                                 <input type="hidden" name="id" value="{{ zone.id }}">
                                 <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
@@ -347,6 +357,7 @@
                         <td>ID: {{ capteur.id }}</td>
                         <td>
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer ce capteur ?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <input type="hidden" name="form_type" value="delete_capteur">
                                 <input type="hidden" name="id" value="{{ capteur.id }}">
                                 <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
@@ -364,6 +375,7 @@
                         </td>
                         <td>
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <input type="hidden" name="form_type" value="delete_user">
                                 <input type="hidden" name="id" value="{{ user.id }}">
                                 <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>
@@ -378,6 +390,7 @@
                         <td>{{ p.email }}</td>
                         <td>
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer ce pompier ?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <input type="hidden" name="form_type" value="delete_pompier">
                                 <input type="hidden" name="id" value="{{ p.id }}">
                                 <button type="submit" class="btn btn--sm" style="color: var(--color-error); padding: 2px 8px;">Supprimer</button>

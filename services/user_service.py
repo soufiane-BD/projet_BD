@@ -1,5 +1,7 @@
 from utils.database import get_db_connection
+from utils.security import validate_password_strength
 from werkzeug.security import generate_password_hash
+
 
 def get_all_users():
     """Return all users from the database."""
@@ -13,8 +15,11 @@ def get_all_users():
     connection.close()
     return [dict(row) for row in rows]
 
+
 def add_user(email, password, nom, id_cooperative=None):
     """Add a new user with a hashed password."""
+    if not validate_password_strength(password):
+        raise ValueError("Mot de passe trop faible.")
     password_hash = generate_password_hash(password)
     connection = get_db_connection()
     cursor = connection.execute(
@@ -24,8 +29,8 @@ def add_user(email, password, nom, id_cooperative=None):
     connection.commit()
     user_id = cursor.lastrowid
     connection.close()
-    print(f"DEBUG: Utilisateur {email} inséré avec succès (ID: {user_id})")
     return user_id
+
 
 def delete_user(user_id):
     """Delete a user by its ID."""
@@ -35,3 +40,10 @@ def delete_user(user_id):
     deleted = cursor.rowcount > 0
     connection.close()
     return deleted
+
+
+def update_user_password(user_id, new_password_hash):
+    connection = get_db_connection()
+    connection.execute("UPDATE user SET password_hash = ? WHERE id = ?", (new_password_hash, user_id))
+    connection.commit()
+    connection.close()

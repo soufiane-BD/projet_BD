@@ -42,6 +42,7 @@
           <td data-label="État">
             {% if current_user.is_authenticated and current_user.role == 'pompier' %}
             <form action="{{ url_for('traiter_alerte', alerte_id=a.id) }}" method="POST">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn btn--sm {% if a.est_traite %}btn--ghost{% else %}btn--primary{% endif %}" style="min-width: 120px;">
                 {% if a.est_traite %}
                   <span style="color: var(--ok);">✓ Traitée</span>
