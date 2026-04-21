@@ -1,3 +1,18 @@
+## 👥 Équipe
+
+### 🏗️ Architecture & Développement
+- [ELBADAOUI Soufiane](https://github.com/soufiane-BD)
+- [EL Ouafi Souad](https://github.com/souad-elouafi)
+- [ELLAOUI Amal](https://github.com/amalellaoui)
+
+### 🔐 Sécurité
+- [El Mehdi](https://github.com/el-mehdi33)
+- [FAJRI Rania](https://github.com/RaniaFJ)
+- [EL BARAKA Rim](https://github.com/Reemap1)
+- [EL Lkhessouani Ilyas](https://github.com/Ilyas122ux)
+- [HADAD Haytam](https://github.com/haytam-hadad)
+- [Gourmije Ferdaousse](https://github.com/ferdaoussegourmije)
+
 # Argan-Fire Watch — projet_BD
 
 Application Flask : templates dans `templates/`, styles et scripts dans `static/`, logique et données dans `app.py`.
