@@ -14,11 +14,9 @@
 - [Gourmije Ferdaousse](https://github.com/ferdaoussegourmije)
 ## 🎥 Démonstration
 
-<video width="600" controls>
-  <source src="app_video.mp4" type="video/mp4">
-  Votre navigateur ne supporte pas la vidéo.
-</video>
+![Aperçu](demo.gif)
 
+👉 [Voir la vidéo complète](./app_video.mp4)
 # Argan-Fire Watch — projet_BD
 
 Application Flask : templates dans `templates/`, styles et scripts dans `static/`, logique et données dans `app.py`.
