@@ -15,7 +15,7 @@
 ## 🎥 Démonstration
 
 <video width="600" controls>
-  <source src="demo.mp4" type="video/mp4">
+  <source src="app_video.mp4" type="video/mp4">
   Votre navigateur ne supporte pas la vidéo.
 </video>
 
