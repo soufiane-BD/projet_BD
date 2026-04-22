@@ -13,6 +13,12 @@
 - [HADAD Haytam](https://github.com/haytam-hadad)
 - [Gourmije Ferdaousse](https://github.com/ferdaoussegourmije)
 
+## 🎥 Démonstration
+
+![Aperçu](demo.gif)
+
+👉 [Voir la vidéo complète](./app_video.mp4)
+
 # Argan-Fire Watch — projet_BD
 
 Application Flask : templates dans `templates/`, styles et scripts dans `static/`, logique et données dans `app.py`.
