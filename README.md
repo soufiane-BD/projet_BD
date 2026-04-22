@@ -17,6 +17,9 @@
 ![Aperçu](demo.gif)
 
 👉 [Voir la vidéo complète](./app_video.mp4)
+## 📄 Rapport du projet
+
+👉 [Télécharger le rapport PDF](./rapport de argan Fire Watch.pdf)
 # Argan-Fire Watch — projet_BD
 
 Application Flask : templates dans `templates/`, styles et scripts dans `static/`, logique et données dans `app.py`.
