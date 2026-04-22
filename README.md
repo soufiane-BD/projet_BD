@@ -12,12 +12,12 @@
 - [EL Lkhessouani Ilyas](https://github.com/Ilyas122ux)
 - [HADAD Haytam](https://github.com/haytam-hadad)
 - [Gourmije Ferdaousse](https://github.com/ferdaoussegourmije)
-
 ## 🎥 Démonstration
 
-![Aperçu](demo.gif)
-
-👉 [Voir la vidéo complète](./app_video.mp4)
+<video width="600" controls>
+  <source src="demo.mp4" type="video/mp4">
+  Votre navigateur ne supporte pas la vidéo.
+</video>
 
 # Argan-Fire Watch — projet_BD
 
